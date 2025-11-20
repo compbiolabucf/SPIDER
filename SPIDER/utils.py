@@ -6,8 +6,28 @@ import scanpy as sc
 import anndata
 import multiprocessing
 from tqdm.notebook import tqdm
-import random, sklearn
+import random, sklearn.neighbors
+import scipy.sparse as sp
+from torch_geometric.data import Data
 
+def process_data(adata):
+    df = adata.uns['Spatial_Net'].copy()
+    cells = np.array(adata.obs_names)
+    cell2id = dict(zip(cells, range(cells.shape[0])))
+    df['Cell1'] = df['Cell1'].map(cell2id)
+    df['Cell2'] = df['Cell2'].map(cell2id)
+
+    G = sp.coo_matrix((np.ones(df.shape[0]), (df['Cell1'], df['Cell2'])), shape=(adata.n_obs, adata.n_obs))
+    G = G + sp.eye(G.shape[0])
+
+    edge = np.nonzero(G)
+    if type(adata.X) == np.ndarray:
+        data = Data(edge_index=torch.LongTensor(np.array(
+            [edge[0], edge[1]])), x=torch.FloatTensor(adata.X)) 
+    else:
+        data = Data(edge_index=torch.LongTensor(np.array(
+            [edge[0], edge[1]])), x=torch.FloatTensor(adata.X.todense()))
+    return data
 
 def generate_a_spot(sc_exp, 
                     min_cell_number_in_spot, 
@@ -88,6 +108,7 @@ def pseudo_spot_generation(sc_exp,
         
     return pseudo_spots
 
+
 def Cal_knn_expression(adata, k_cutoff=8, verbose=True):
     """\
     Construct the spatial neighbor networks.
@@ -130,6 +151,18 @@ def Cal_knn_expression(adata, k_cutoff=8, verbose=True):
         print('%.4f neighbors per cell on average.' %(Spatial_Net.shape[0]/adata.n_obs))
 
     adata.uns['Similarity_Net'] = Spatial_Net
+
+def Stats_Spatial_Net(adata):
+    import matplotlib.pyplot as plt
+    Num_edge = adata.uns['Spatial_Net']['Cell1'].shape[0]
+    Mean_edge = Num_edge/adata.shape[0]
+    plot_df = pd.value_counts(pd.value_counts(adata.uns['Spatial_Net']['Cell1']))
+    plot_df = plot_df/adata.shape[0]
+    fig, ax = plt.subplots(figsize=[3,2])
+    plt.ylabel('Percentage')
+    plt.xlabel('')
+    plt.title('Number of Neighbors (Mean=%.2f)'%Mean_edge)
+    ax.bar(plot_df.index, plot_df)
 
 def Cal_Spatial_Net(adata, rad_cutoff=None, k_cutoff=None, model='Radius', verbose=True):
     """\
@@ -185,3 +218,23 @@ def Cal_Spatial_Net(adata, rad_cutoff=None, k_cutoff=None, model='Radius', verbo
         print('%.4f neighbors per cell on average.' %(Spatial_Net.shape[0]/adata.n_obs))
 
     adata.uns['Spatial_Net'] = Spatial_Net
+
+def mclust_R(adata, num_cluster, modelNames='EEE', used_obsm='SPIDER', random_seed=2020):
+   
+    np.random.seed(random_seed)
+    import rpy2.robjects as robjects
+    robjects.r.library("mclust")
+
+    import rpy2.robjects.numpy2ri
+    rpy2.robjects.numpy2ri.activate()
+    r_random_seed = robjects.r['set.seed']
+    r_random_seed(random_seed)
+    rmclust = robjects.r['Mclust']
+
+    res = rmclust(rpy2.robjects.numpy2ri.numpy2rpy(adata.obsm[used_obsm]), num_cluster, modelNames)
+    mclust_res = np.array(res[-2])
+
+    adata.obs['mclust'] = mclust_res
+    adata.obs['mclust'] = adata.obs['mclust'].astype('int')
+    adata.obs['mclust'] = adata.obs['mclust'].astype('category')
+    return adata

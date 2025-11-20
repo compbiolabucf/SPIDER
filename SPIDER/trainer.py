@@ -3,14 +3,14 @@ import numpy as np, time
 import pandas as pd
 from tqdm import tqdm
 import scipy.sparse as sp
-from STAGATE_pyG.utils import Transfer_pytorch_Data
+from .utils import process_data
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
 import torch.nn as nn,gc
 import matplotlib.pyplot as plt
 import random
-from model import SPIDER, MMDLoss, ZINB_loss
+from .model import SPIDER, MMDLoss, ZINB_loss
 
 def set_local_determinism(seed: int = 0, use_cuda: bool = True, strict: bool = True):
     import random, numpy as np, torch
@@ -64,7 +64,7 @@ def train_SPIDER(adata, psdata, model=None,n_epochs=500, lr=0.00025, key_added='
     if 'Spatial_Net' not in adata.uns.keys():
         raise ValueError("Spatial_Net does not exist! Run Cal_Spatial_Net first!")
 
-    data = Transfer_pytorch_Data(adata_vars)
+    data = process_data(adata_vars)
     scale_factor = torch.tensor(adata.obs['scale_factor'], dtype=torch.float)
     data.scale_factor = scale_factor.to(device)
     data.raw = raw_data.to(device)
