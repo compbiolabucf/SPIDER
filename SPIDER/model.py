@@ -130,54 +130,22 @@ class GATConv(MessagePassing):
         self.dropout = dropout
         self.add_self_loops = add_self_loops
 
-        # In case we are operating in bipartite graphs, we apply separate
-        # transformations 'lin_src' and 'lin_dst' to source and target nodes:
-        # if isinstance(in_channels, int):
-        #     self.lin_src = Linear(in_channels, heads * out_channels,
-        #                           bias=False, weight_initializer='glorot')
-        #     self.lin_dst = self.lin_src
-        # else:
-        #     self.lin_src = Linear(in_channels[0], heads * out_channels, False,
-        #                           weight_initializer='glorot')
-        #     self.lin_dst = Linear(in_channels[1], heads * out_channels, False,
-        #                           weight_initializer='glorot')
 
         self.lin_src = nn.Parameter(torch.zeros(size=(in_channels, out_channels)))
         nn.init.xavier_normal_(self.lin_src.data, gain=1.414)
         self.lin_dst = self.lin_src
 
-
-        # The learnable parameters to compute attention coefficients:
         self.att_src = Parameter(torch.Tensor(1, heads, out_channels))
         self.att_dst = Parameter(torch.Tensor(1, heads, out_channels))
         nn.init.xavier_normal_(self.att_src.data, gain=1.414)
         nn.init.xavier_normal_(self.att_dst.data, gain=1.414)
 
-        # if bias and concat:
-        #     self.bias = Parameter(torch.Tensor(heads * out_channels))
-        # elif bias and not concat:
-        #     self.bias = Parameter(torch.Tensor(out_channels))
-        # else:
-        #     self.register_parameter('bias', None)
 
         self._alpha = None
         self.attentions = None
 
-        # self.reset_parameters()
-
-    # def reset_parameters(self):
-    #     self.lin_src.reset_parameters()
-    #     self.lin_dst.reset_parameters()
-    #     glorot(self.att_src)
-    #     glorot(self.att_dst)
-    #     # zeros(self.bias)
-
     def forward(self, x: Union[Tensor, OptPairTensor], edge_index: Adj,
                 size: Size = None, return_attention_weights=None, attention=True, tied_attention = None):
-        # type: (Union[Tensor, OptPairTensor], Tensor, Size, NoneType) -> Tensor  # noqa
-        # type: (Union[Tensor, OptPairTensor], SparseTensor, Size, NoneType) -> Tensor  # noqa
-        # type: (Union[Tensor, OptPairTensor], Tensor, Size, bool) -> Tuple[Tensor, Tuple[Tensor, Tensor]]  # noqa
-        # type: (Union[Tensor, OptPairTensor], SparseTensor, Size, bool) -> Tuple[Tensor, SparseTensor]  # noqa
         r"""
         Args:
             return_attention_weights (bool, optional): If set to :obj:`True`,
@@ -187,13 +155,10 @@ class GATConv(MessagePassing):
         """
         H, C = self.heads, self.out_channels
 
-        # We first transform the input node features. If a tuple is passed, we
-        # transform source and target node features via separate weights:
         if isinstance(x, Tensor):
             assert x.dim() == 2, "Static graphs not supported in 'GATConv'"
-            # x_src = x_dst = self.lin_src(x).view(-1, H, C)
             x_src = x_dst = torch.mm(x, self.lin_src).view(-1, H, C)
-        else:  # Tuple of source and target node features:
+        else:  
             x_src, x_dst = x
             assert x_src.dim() == 2, "Static graphs not supported in 'GATConv'"
             x_src = self.lin_src(x_src).view(-1, H, C)
@@ -204,11 +169,8 @@ class GATConv(MessagePassing):
 
         if not attention:
             return x[0].mean(dim=1)
-            # return x[0].view(-1, self.heads * self.out_channels)
 
         if tied_attention == None:
-            # Next, we compute node-level attention coefficients, both for source
-            # and target nodes (if present):
             alpha_src = (x_src * self.att_src).sum(dim=-1)
             alpha_dst = None if x_dst is None else (x_dst * self.att_dst).sum(-1)
             alpha = (alpha_src, alpha_dst)
@@ -219,8 +181,6 @@ class GATConv(MessagePassing):
 
         if self.add_self_loops:
             if isinstance(edge_index, Tensor):
-                # We only want to add self-loops for nodes that appear both as
-                # source and target nodes:
                 num_nodes = x_src.size(0)
                 if x_dst is not None:
                     num_nodes = min(num_nodes, x_dst.size(0))
@@ -230,7 +190,6 @@ class GATConv(MessagePassing):
             elif isinstance(edge_index, SparseTensor):
                 edge_index = set_diag(edge_index)
 
-        # propagate_type: (x: OptPairTensor, alpha: OptPairTensor)
         out = self.propagate(edge_index, x=x, alpha=alpha, size=size)
 
         alpha = self._alpha
@@ -241,9 +200,6 @@ class GATConv(MessagePassing):
             out = out.view(-1, self.heads * self.out_channels)
         else:
             out = out.mean(dim=1)
-
-        # if self.bias is not None:
-        #     out += self.bias
 
         if isinstance(return_attention_weights, bool):
             if isinstance(edge_index, Tensor):
@@ -256,14 +212,11 @@ class GATConv(MessagePassing):
     def message(self, x_j: Tensor, alpha_j: Tensor, alpha_i: OptTensor,
                 index: Tensor, ptr: OptTensor,
                 size_i: Optional[int]) -> Tensor:
-        # Given egel-level attention coefficients for source and target nodes,
-        # we simply need to sum them up to "emulate" concatenation:
         alpha = alpha_j if alpha_i is None else alpha_j + alpha_i
 
-        #alpha = F.leaky_relu(alpha, self.negative_slope)
         alpha = torch.sigmoid(alpha)
         alpha = softmax(alpha, index, ptr, size_i)
-        self._alpha = alpha  # Save for later use.
+        self._alpha = alpha  
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
         return x_j * alpha.unsqueeze(-1)
 
@@ -274,10 +227,9 @@ class GATConv(MessagePassing):
 
 
 
-
 class SPIDER(nn.Module):
     """
-    DUSTED: A dual-attention spatial transcriptomics enhanced denoiser model.
+    SPIDER: SPIDER: Spatially Integrated Denoising via Embedding Regularization with Single-Cell Supervision
 
     Args:
         hidden_dims (list): List of dimensions for input, hidden, and output layers.
