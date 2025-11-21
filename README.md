@@ -11,17 +11,6 @@
 
 ## 📦 Installation
 
-Install R 4.5.1
-
-You can try using the command
-
-```bash
-sudo apt update && sudo apt install -y build-essential gfortran libreadline-dev libx11-dev libxt-dev libpng-dev libjpeg-dev libcairo2-dev libssl-dev libcurl4-openssl-dev libbz2-dev liblzma-dev libpcre2-dev libxml2-dev zlib1g-dev wget tar && \
-wget https://cran.r-project.org/src/base/R-4/R-4.5.2.tar.gz && \
-tar -xvf R-4.5.2.tar.gz && cd R-4.5.2 && \
-./configure --enable-R-shlib --with-blas --with-lapack && \
-make -j$(nproc) && sudo make install && R --version
-```
 
 Install the conda environment using the bash file 
 ```bash
@@ -29,6 +18,32 @@ git clone https://github.com/compbiolabucf/SPIDER.git
 cd SPIDER
 conda env create -f environment.yml
 conda activate spider
+```
+
+Next install R version 4.5.1
+
+You can try using the following command from the **spider** environment
+
+```bash
+conda install -c conda-forge r-base=4.5.1
+```
+
+Or 
+
+```bash
+sudo apt update
+sudo apt install -y build-essential gfortran libreadline-dev libx11-dev libxt-dev libpng-dev libjpeg-dev libcairo2-dev libssl-dev libcurl4-openssl-dev libbz2-dev liblzma-dev libpcre2-dev libxml2-dev zlib1g-dev wget tar
+wget https://cran.r-project.org/src/base/R-4/R-4.5.1.tar.gz
+tar -xvf R-4.5.1.tar.gz
+cd R-4.5.1
+./configure --enable-R-shlib --with-blas --with-lapack --with-icu-lib=/usr/lib/x86_64-linux-gnu
+make -j$(nproc)
+sudo make install
+```
+
+Install required libraries for python 
+
+```bash
 chmod +x create_environment.sh
 ./create_environment.sh
 ```
@@ -41,10 +56,14 @@ python setup.py install
 ```
 
 
-
 ## Running Denoising 
 
 The sample dataset can be downloaded from this [link](https://drive.google.com/file/d/14sieoleV-a8Hx9KVVWDFZk5-5MjGsRLT/view?usp=sharing).
+
+Or by running 
+```bash
+wget https://huggingface.co/datasets/istiaq28/DLPFC_SPIDER/resolve/main/DLPFC_data.pickle -O data/DLPFC_data.pickle
+```
 
 The sample dataset is created using ***preprocess_data.py***, using the DLPFC ST and SC data to create pseudo ST data. 
 
@@ -53,10 +72,12 @@ Use the ***tutorial.ipynb*** file to run the denoiser.
 
 Provided ST data and SC data,  ***preprocess_data.py*** can be used to create the data pickle file before running the denoiser.
 
-Using the pickle file which contains the real-ST and pseudo-ST data, denoiser can be run usning the terminal 
+For terminal usage you can run ```python trainer.py <data-path>```
+
+Using the pickle file which contains DLPFC real-ST and pseudo-ST data, denoiser can be run usning the terminal 
 
 ```bash
-python trainer.py <data_path_to_pickle_file>
+python trainer.py data/DLPFC_data.pickle
 
 ```
 
