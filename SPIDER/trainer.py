@@ -1,5 +1,5 @@
 
-import numpy as np, time
+import numpy as np, time, os
 import pandas as pd
 from tqdm import tqdm
 import scipy.sparse as sp
@@ -147,7 +147,11 @@ def train_SPIDER(adata, psdata, model=None,n_epochs=500, lr=0.00025, key_added='
     plt.ylabel('Loss')
     plt.title('Training Loss Curve')
     plt.legend()
-    plt.show()
+    try:
+        os.makedirs("results", exist_ok=True)
+        plt.savefig("results/Loss_plot.pdf", dpi=300)
+    except:
+        plt.show()
 
     model.eval()
     

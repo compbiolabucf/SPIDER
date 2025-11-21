@@ -25,6 +25,8 @@ make -j$(nproc) && sudo make install && R --version
 
 Install the conda environment using the bash file 
 ```bash
+git clone https://github.com/compbiolabucf/SPIDER.git
+cd SPIDER
 chmod +x create_environment.sh
 ./create_environment.sh
 conda activate spider
@@ -32,8 +34,6 @@ conda activate spider
 
 Install SPIDER inside the environment 
 ```bash
-git clone https://github.com/compbiolabucf/SPIDER.git
-cd SPIDER
 python setup.py build
 python setup.py install
 
@@ -50,6 +50,17 @@ The sample dataset is created using ***preprocess_data.py***, using the DLPFC ST
 The file contains preprocessed DLPFC data and a pseudo spot data created from reference scRNA-seq data. 
 Use the ***tutorial.ipynb*** file to run the denoiser. 
 
+Provided ST data and SC data,  ***preprocess_data.py*** can be used to create the data pickle file before running the denoiser.
+
+Using the pickle file which contains the real-ST and pseudo-ST data, denoiser can be run usning the terminal 
+
+```bash
+python trainer.py <data_path_to_pickle_file>
+
+```
+
+Hyperparameters can be changes inside the script's **params** varaible. 
+This will generate a clustering plot and a training loss plot inside *results* directory and show the. 
 
 
 ## Dependencies
