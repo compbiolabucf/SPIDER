@@ -69,6 +69,7 @@ The SPIDER framework requires the following core dependencies:
 
 ```
 python = 3.8.20
+cuda == 11.8 
 torch == 2.1.0+cu118
 torch-geometric == 2.4.0
 torch-cluster == 1.6.3+pt21cu118
