@@ -11,10 +11,27 @@
 
 ## 📦 Installation
 
-```bash
+Install R 4.5.1
 
-conda env create -f environment.yml
+You can try using the command
+
+```bash
+sudo apt update && sudo apt install -y build-essential gfortran libreadline-dev libx11-dev libxt-dev libpng-dev libjpeg-dev libcairo2-dev libssl-dev libcurl4-openssl-dev libbz2-dev liblzma-dev libpcre2-dev libxml2-dev zlib1g-dev wget tar && \
+wget https://cran.r-project.org/src/base/R-4/R-4.5.2.tar.gz && \
+tar -xvf R-4.5.2.tar.gz && cd R-4.5.2 && \
+./configure --enable-R-shlib --with-blas --with-lapack && \
+make -j$(nproc) && sudo make install && R --version
+```
+
+Install the conda environment using the bash file 
+```bash
+chmod +x create_environment.sh
+./create_environment.sh
 conda activate spider
+```
+
+Install SPIDER inside the environment 
+```bash
 git clone https://github.com/compbiolabucf/SPIDER.git
 cd SPIDER
 python setup.py build
