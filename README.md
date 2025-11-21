@@ -63,6 +63,6 @@ torch-geometric == 2.4.0
 torch-cluster == 1.6.3+pt21cu118
 torch-scatter == 2.1.2
 torch-sparse == 0.6.18
-R == 4.5.1
+R == 4.5.1 (R package mclust 5.4.10)
 ```
 ## Citation
