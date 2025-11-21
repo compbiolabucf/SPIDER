@@ -1,7 +1,3 @@
-source "$(conda info --base)/etc/profile.d/conda.sh"
-conda env create -f environment.yml
-conda init
-conda activate spider
 pip install torch==2.1.0+cu118 --index-url https://download.pytorch.org/whl/cu118
 pip install torchvision==0.16.0+cu118 --index-url https://download.pytorch.org/whl/cu118
 pip install torchaudio==2.1.0+cu118 --index-url https://download.pytorch.org/whl/cu118

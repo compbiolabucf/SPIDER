@@ -27,9 +27,10 @@ Install the conda environment using the bash file
 ```bash
 git clone https://github.com/compbiolabucf/SPIDER.git
 cd SPIDER
+conda env create -f environment.yml
+conda activate spider
 chmod +x create_environment.sh
 ./create_environment.sh
-conda activate spider
 ```
 
 Install SPIDER inside the environment 
