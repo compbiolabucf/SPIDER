@@ -1,5 +1,5 @@
 from SPIDER import pseudo_spot_generation
-import os, scanpy as sc, pandas as pd, numpy as np
+import os, scanpy as sc, pandas as pd, numpy as np, pickle
 def load_DLPFC():
     data_name = "DLPFC_sc_st_ps.pickle"  # name for processed data file
     save_directory = "path to directory to save processed data"

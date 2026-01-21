@@ -23,6 +23,8 @@ def run_training():
         loaded = pickle.load(f)
     print("Data loaded")
 
+    # If using the provided CID44971 data please modify the code accordingly 
+    
     std, psd = loaded["realST"], loaded["pseudoST"]
     results_dir = "results"
     os.makedirs(results_dir, exist_ok=True)
