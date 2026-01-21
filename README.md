@@ -58,12 +58,14 @@ python setup.py install
 
 ## Running Denoising 
 
-The sample dataset can be downloaded from this [link](https://drive.google.com/file/d/14sieoleV-a8Hx9KVVWDFZk5-5MjGsRLT/view?usp=sharing).
+The DLPFC dataset can be downloaded from this [link](https://drive.google.com/file/d/14sieoleV-a8Hx9KVVWDFZk5-5MjGsRLT/view?usp=sharing).
+The CID44971 breast cancer dataset can be downloaded from this [link](https://drive.google.com/file/d/1SkH6o1K3UTm1Z6mejnVw34PUvoqfcoVW/view?usp=drive_link).
 
 Or by running 
 ```bash
 wget https://huggingface.co/datasets/istiaq28/DLPFC_SPIDER/resolve/main/DLPFC_data.pickle -O data/DLPFC_data.pickle
 ```
+The DLPFC data should be placed in the "data/" directory to run the "tutorial.ipynb".
 
 The sample dataset is created using ***preprocess_data.py***, using the DLPFC ST and SC data to create pseudo ST data. 
 
