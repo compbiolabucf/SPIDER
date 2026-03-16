@@ -8,13 +8,14 @@ def load_DLPFC():
             loaded = pickle.load(f)
         scadata, adata, pseudo_adata = loaded['sc'],loaded['realST'],loaded['pseudoST']
         adata.X = adata.X.toarray()
+        adata.raw = adata.copy()
         sc.pp.normalize_total(adata,target_sum=1e4)
         sc.pp.log1p(adata)
         sc.pp.normalize_total(pseudo_adata,target_sum=1e4)
         sc.pp.log1p(pseudo_adata)
         adata.uns['rad_cutoff'] = 239
         adata.uns['num_cluster'] = 7
-        scadata.obsm['spatial'] = coord.loc[scadata.obs_names,:][['X','Y']].values.astype(float)
+        # scadata.obsm['spatial'] = coord.loc[scadata.obs_names,:][['X','Y']].values.astype(float)
         adata = adata[~adata.obs['Ground Truth'].isna()]
         return scadata, adata, pseudo_adata
 

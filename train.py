@@ -24,6 +24,7 @@ def run_training():
     print("Data loaded")
 
     # If using the provided CID44971 data please modify the code accordingly 
+    # Data available in ./data/data_links.txt file
     
     std, psd = loaded["realST"], loaded["pseudoST"]
     results_dir = "results"
@@ -52,8 +53,6 @@ def run_training():
 
     fig = sc.pl.embedding(std,basis="spatial", color=["mclust","Ground Truth"],s=100, title=[f"SPIDER\nClustering metrics ARI:{ARI}, NMI: {NMI}, HS: {HS}","Ground Truth"],show=False, return_fig=True)
     fig.savefig(os.path.join(results_dir,f"{fname}_cluster.pdf"), dpi=300)
-
-
 
 if __name__ == "__main__":
     run_training()

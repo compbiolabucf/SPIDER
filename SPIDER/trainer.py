@@ -50,6 +50,8 @@ def train_SPIDER(adata, psdata, model=None,n_epochs=500, lr=0.00025, key_added='
 
     # Preprocess the data
     adata.X = sp.csr_matrix(adata.X)
+
+    #Keeping raw count matrix for ZINB loss calculation
     raw_sparse_data = sp.csr_matrix(adata.raw.X)
     raw_data = torch.Tensor(raw_sparse_data.toarray())
 

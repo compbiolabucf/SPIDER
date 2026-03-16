@@ -7,7 +7,7 @@ __url__ = "https://github.com/compbiolabucf/SPIDER"
 __author__ = "MD Istiaq Ansari"
 __author_email__ = "istiaq@ucf.edu"
 __license__ = "MIT"
-__keywords__ = ["spatial transcriptomics", "Deep learning", "Graph attention auto-encoder"]
+__keywords__ = ["spatial transcriptomics", "Deep learning", "Graph attention auto-encoder", "Denoise", "Domain Alignment"]
 __requires__ = ["requests",]
 
 setup(
